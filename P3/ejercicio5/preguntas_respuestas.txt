@@ -1,0 +1,33 @@
+Pregunta 1: ¿Cuántos bloques de disco ocupa el fichero fichero1? ¿Y el fichero fichero2? ¿Cuál es su tamaño en bytes?
+Respuesta 1:
+- fichero1: 0 bloques (0 bytes reservados por no tener contenido).
+- fichero2: 8 bloques de 512 B (4096 bytes asignados), tamaño real st_size = 10 bytes.
+
+Pregunta 2: ¿Cuál es el tamaño reportado para subdir? ¿Por qué el campo número de enlaces (Links) en este caso es 2?
+Respuesta 2:
+- Size: 4096 bytes (tamaño interno del directorio que almacena sus entradas).
+- Links: 2 (uno por la entrada “subdir” en su directorio padre y otro por la entrada “.” que se refiere a sí mismo).
+
+Pregunta 3: ¿Comparten número de i-nodo alguno de los ficheros o directorios creados? Incluye en tu respuesta el comportamiento ante un directorio, específicamente de las entradas ocultas del directorio subdir.
+Respuesta 3:
+- fichero2 y enlaceH comparten el mismo número de i-nodo (hard link).
+- enlaceS tiene un i-nodo distinto (symlink).
+- En un directorio:
+  - “.” comparte el i-nodo con el directorio.
+  - “..” usa el i-nodo del directorio padre.
+
+Pregunta 4: Muestra el contenido de enlaceH y de enlaceS utilizando el comando cat. A continuación, borra el fichero fichero2 y repite el procedimiento. ¿Puedes acceder en ambos casos al contenido del fichero?
+Respuesta 4:
+- Antes de borrar fichero2:
+  - cat enlaceH → imprime "abcdefghij"
+  - cat enlaceS → imprime "abcdefghij"
+- Después de borrar fichero2:
+  - cat enlaceH → sigue funcionando (hard link mantiene los datos).
+  - cat enlaceS → falla (enlace simbólico roto).
+
+Pregunta 5: Utiliza la orden touch para modificar las fechas de acceso y modificación del fichero enlaceH. ¿Qué cambios se observan en la salida de stat tras su ejecución? Investiga a través de la página de manual para modificar únicamente una de dichas fechas (modificación o acceso).
+Respuesta 5:
+- Ejecutar `touch enlaceH` actualiza la fecha de modificación (mtime) del i-nodo compartido con fichero2.
+- Para cambiar solo la fecha de acceso (atime): `touch -a enlaceH`
+- Para cambiar solo la fecha de modificación (mtime): `touch -m enlaceH`
+- Para modificar el timestamp del propio enlace simbólico sin dereferenciar (enlaceS): `touch -h -a enlaceS` o `touch -h -m enlaceS`
