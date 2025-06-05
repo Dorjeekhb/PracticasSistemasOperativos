@@ -26,10 +26,6 @@
 // Número de veces que cada salvaje come
 #define NUMITER  3
 
-// Cantidad de raciones que consume en cada iteración (por defecto 1, se puede
-// modificar mediante argumento de línea de órdenes)
-static int portion_size = 1;
-
 static sem_t *mutex_sem = NULL;
 static sem_t *full_sem  = NULL;
 static sem_t *empty_sem = NULL;
@@ -64,9 +60,9 @@ int getServingsFromPot(void) {
 }
 
 // Simula comer: imprime mensaje y duerme un tiempo aleatorio
-void eat(int amount) {
+void eat(void) {
     pid_t id = getpid();
-    printf("Savage %d: eating %d serving(s)\n", id, amount);
+    printf("Savage %d: eating\n", id);
     sleep(rand() % 5 + 1);
 }
 
@@ -74,21 +70,12 @@ void eat(int amount) {
 void savages(void) {
     srand(getpid());  // semilla distinta por proceso
     for (int i = 0; i < NUMITER; i++) {
-        for (int j = 0; j < portion_size; j++) {
-            getServingsFromPot();
-        }
-        eat(portion_size);
+        getServingsFromPot();
+        eat();
     }
 }
 
-int main(int argc, char *argv[]) {
-    if (argc > 1) {
-        portion_size = atoi(argv[1]);
-        if (portion_size <= 0) {
-            fprintf(stderr, "Invalid portion size: %s\n", argv[1]);
-            return EXIT_FAILURE;
-        }
-    }
+int main(void) {
     // 1) Abrir memoria compartida existente
     shm_fd = shm_open(SHM_NAME, O_RDWR, 0);
     if (shm_fd < 0) {
